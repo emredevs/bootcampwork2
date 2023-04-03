@@ -1,41 +1,27 @@
 import "./App.css";
 import { useState } from "react";
+import Form from "./components/Form/Form";
+import List from "./components/List/List";
+import Footer from "./components/Foother/Footer";
 function App() {
   const [note, setNote] = useState([]);
   const [category, setCategory] = useState(null);
-  const formSubmit = (e) => {
-    e.preventDefault();
-    const todoInput = e.target["todo-input"];
-    if (!todoInput.value) {
-      return;
-    }
-    setNote([{ todo: todoInput.value, checked: false }, ...note]);
-    todoInput.value = "";
-  };
-  console.log(note);
 
+  //bu işlem listeye eklenen notu silmek için aşağıda prop olarak geçtim componensts'e
   const deleteByIndex = (index) => {
     setNote((oldValues) => {
       return oldValues.filter((_, i) => i !== index);
     });
   };
-
+  ///Filtreleme işleminin eski ve kullanışsız hali
   // const [filterNote, setFiteredNote] = useState(note);
-
-  // const completedNote = () => {
-  //   const filtered = note.filter((notes) => notes.checked === true);
-  //   setFiteredNote(filtered);
+  // const filterNotes = (condition) => {
+  //   const filtered = note.filter((note) => note.checked === condition);
+  //   setFilteredNote(filtered);
   // };
+  // const showAllNotes = () => setFilteredNote(note);
 
-  // const activeNote = () => {
-  //   const filtered = note.filter((notes) => notes.checked === false);
-  //   setFiteredNote(filtered);
-  // };
-
-  // const allNote = () => {
-  //   setFiteredNote(note);
-  // };
-
+  ///filtreleme işleminin son hali. bu halini yazarken profosyenel yardım aldım bildirmek istiyorum
   const filterNotes = () => {
     return note.filter((note) => {
       if (category === null) {
@@ -44,83 +30,17 @@ function App() {
       return note.checked === category;
     });
   };
-
+  console.log(note);
   return (
     <div className="App">
-      <section className="todoapp">
-        <header className="header">
-          <h1>todos</h1>
-          <form onSubmit={formSubmit}>
-            <input
-              name="todo-input"
-              className="new-todo"
-              placeholder="What needs to be done?"
-              autoFocus
-            />
-          </form>
-        </header>
-
-        <section className="main">
-          <input className="toggle-all" type="checkbox" id="toggle-all" />
-          <label htmlFor="toggle-all">Mark all as complete</label>
-
-          <ul className="todo-list">
-            {filterNotes().map((notes, index) => {
-              return (
-                <li className="completed" key={index}>
-                  <div className="view">
-                    <input
-                      className="toggle"
-                      type="checkbox"
-                      checked={notes.checked}
-                      onChange={(event) => {
-                        const newTodos = [...note];
-                        newTodos[index].checked = event.target.checked;
-                        setNote(newTodos);
-                      }}
-                      id={index}
-                    />
-                    <label htmlFor={index}>{notes.todo}</label>
-                    <button
-                      className="destroy"
-                      onClick={() => deleteByIndex(index)}
-                    ></button>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-
-        <footer className="footer">
-          <span className="todo-count">
-            <strong>{note.length}</strong> items left
-          </span>
-
-          <ul className="filters">
-            <li>
-              <button className="selected" onClick={() => setCategory(null)}>
-                All
-              </button>
-            </li>
-            <li>
-              <button onClick={() => setCategory(false)}>Active</button>
-            </li>
-            <li>
-              <button onClick={() => setCategory(true)}>Completed</button>
-            </li>
-          </ul>
-
-          <button
-            className="clear-completed"
-            onClick={() => {
-              setNote([]);
-            }}
-          >
-            Clear completed
-          </button>
-        </footer>
-      </section>
+      <Form setNote={(note) => setNote((prev) => [note, ...prev])} />
+      <List
+        filterNotes={filterNotes}
+        deleteByIndex={deleteByIndex}
+        note={note}
+        setNote={setNote}
+      />
+      <Footer note={note} setCategory={setCategory} setNote={setNote} />
     </div>
   );
 }
